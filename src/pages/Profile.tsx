@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -23,8 +23,6 @@ const profileValidationSchema = Yup.object().shape({
     .required("Name is required")
     .min(3, "Name must be at least 3 characters")
     .matches(/^[a-zA-Z\s]*$/, "Name can only contain letters and spaces"),
-
-  phone: Yup.string()
     .nullable()
     .matches(
       /^(01)[0-2|5]{1}[0-9]{8}$/,
@@ -34,15 +32,13 @@ const profileValidationSchema = Yup.object().shape({
 
 const passwordValidationSchema = Yup.object().shape({
   currentPassword: Yup.string().required("Current password is required"),
-
   newPassword: Yup.string()
     .required("New password is required")
     .min(8, "Password must be at least 8 characters")
     .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-      "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character"
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]/,
+      "Password must contain at least one uppercase letter, one lowercase letter, and one number"
     ),
-
   confirmPassword: Yup.string()
     .required("Please confirm your password")
     .oneOf([Yup.ref("newPassword")], "Passwords must match"),
@@ -194,7 +190,6 @@ const Profile = () => {
                 newPassword: "",
                 confirmPassword: "",
               }}
-              
               validationSchema={passwordValidationSchema}
               onSubmit={async (values, { setSubmitting, resetForm }) => {
                 try {
@@ -203,7 +198,6 @@ const Profile = () => {
                     values.newPassword,
                     values.confirmPassword
                   );
-
                   if (result.success) {
                     toast.success(result.message);
                     resetForm();

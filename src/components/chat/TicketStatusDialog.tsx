@@ -25,7 +25,10 @@ type StatusOption = {
   description: string;
 };
 
-export const TicketStatusDialog = ({ ticket, onStatusChange }: TicketStatusDialogProps) => {
+export const TicketStatusDialog = ({
+  ticket,
+  onStatusChange,
+}: TicketStatusDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -34,26 +37,26 @@ export const TicketStatusDialog = ({ ticket, onStatusChange }: TicketStatusDialo
       value: "open",
       label: "Open",
       icon: <AlertCircle className="h-5 w-5 text-blue-500" />,
-      description: "Ticket is active and needs attention"
+      description: "Ticket is active and needs attention",
     },
     {
       value: "pending",
       label: "Pending",
       icon: <Clock className="h-5 w-5 text-yellow-500" />,
-      description: "Waiting for customer response"
+      description: "Waiting for customer response",
     },
     {
       value: "resolved",
       label: "Resolved",
       icon: <CheckCircle className="h-5 w-5 text-green-500" />,
-      description: "Issue has been fixed"
+      description: "Issue has been fixed",
     },
     {
       value: "closed",
       label: "Closed",
       icon: <XCircle className="h-5 w-5 text-red-500" />,
-      description: "Ticket is no longer active"
-    }
+      description: "Ticket is no longer active",
+    },
   ];
 
   const getBadgeVariant = (status: Ticket["status"]) => {
@@ -79,18 +82,9 @@ export const TicketStatusDialog = ({ ticket, onStatusChange }: TicketStatusDialo
 
     setIsUpdating(true);
     try {
-      // Update ticket status via API
-      // await ticketService.updateTicket(ticket.id, { status: newStatus });
-      
-      // Notify through socket
-      // socketService.sendMessage(ticket.id, `Ticket status changed to ${newStatus}`);
-      
-      // Call the parent callback
-      // onStatusChange(ticket.id, newStatus);
-      
-
-      
-      toast.success(`Ticket status updated to ${newStatus}`);
+      // Call the onStatusChange prop to update the status in the database
+      await onStatusChange(ticket.id, newStatus);
+      // The toast is now handled in the parent component after a successful API call
     } catch (error) {
       console.error("Failed to update ticket status:", error);
       toast.error("Failed to update ticket status");
@@ -99,7 +93,6 @@ export const TicketStatusDialog = ({ ticket, onStatusChange }: TicketStatusDialo
       setIsOpen(false);
     }
   };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -127,11 +120,17 @@ export const TicketStatusDialog = ({ ticket, onStatusChange }: TicketStatusDialo
             >
               {option.icon}
               <span className="mt-2 font-medium">{option.label}</span>
-              <span className="text-xs text-muted-foreground mt-1">{option.description}</span>
+              <span className="text-xs text-muted-foreground mt-1">
+                {option.description}
+              </span>
             </Button>
           ))}
         </div>
-        <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isUpdating}>
+        <Button
+          variant="outline"
+          onClick={() => setIsOpen(false)}
+          disabled={isUpdating}
+        >
           Cancel
         </Button>
       </DialogContent>
