@@ -24,6 +24,13 @@ const profileValidationSchema = Yup.object().shape({
     .min(3, "Name must be at least 3 characters")
     .matches(/^[a-zA-Z\s]*$/, "Name can only contain letters and spaces"),
 
+  email: Yup.string()
+    .required("Email is required")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|biz|info|io)$/,
+      "Please enter a valid email with a proper domain"
+    ),
+
   phone: Yup.string()
     .nullable()
     .matches(
@@ -119,6 +126,7 @@ const Profile = () => {
             <Formik
               initialValues={{
                 name: user?.name || "",
+                email: user?.email || "",
                 phone: user?.phone || "",
               }}
               validationSchema={profileValidationSchema}
@@ -151,6 +159,22 @@ const Profile = () => {
                       />
                       <ErrorMessage
                         name="name"
+                        component="div"
+                        className="text-sm text-red-500"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Field
+                        as={Input}
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="john@example.com"
+                      />
+                      <ErrorMessage
+                        name="email"
                         component="div"
                         className="text-sm text-red-500"
                       />
