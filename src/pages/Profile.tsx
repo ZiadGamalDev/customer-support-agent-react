@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -23,14 +23,6 @@ const profileValidationSchema = Yup.object().shape({
     .required("Name is required")
     .min(3, "Name must be at least 3 characters")
     .matches(/^[a-zA-Z\s]*$/, "Name can only contain letters and spaces"),
-
-  email: Yup.string()
-    .required("Email is required")
-    .matches(
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|biz|info|io)$/,
-      "Please enter a valid email with a proper domain"
-    ),
-
   phone: Yup.string()
     .nullable()
     .matches(
@@ -41,15 +33,13 @@ const profileValidationSchema = Yup.object().shape({
 
 const passwordValidationSchema = Yup.object().shape({
   currentPassword: Yup.string().required("Current password is required"),
-
   newPassword: Yup.string()
     .required("New password is required")
     .min(8, "Password must be at least 8 characters")
     .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-      "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character"
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]/,
+      "Password must contain at least one uppercase letter, one lowercase letter, and one number"
     ),
-
   confirmPassword: Yup.string()
     .required("Please confirm your password")
     .oneOf([Yup.ref("newPassword")], "Passwords must match"),
@@ -126,7 +116,6 @@ const Profile = () => {
             <Formik
               initialValues={{
                 name: user?.name || "",
-                email: user?.email || "",
                 phone: user?.phone || "",
               }}
               validationSchema={profileValidationSchema}
@@ -166,17 +155,11 @@ const Profile = () => {
 
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
-                      <Field
-                        as={Input}
+                      <Input
                         id="email"
-                        name="email"
-                        type="email"
-                        placeholder="john@example.com"
-                      />
-                      <ErrorMessage
-                        name="email"
-                        component="div"
-                        className="text-sm text-red-500"
+                        value={user?.email || ""}
+                        readOnly
+                        className="bg-gray-100 cursor-not-allowed"
                       />
                     </div>
 
@@ -218,7 +201,6 @@ const Profile = () => {
                 newPassword: "",
                 confirmPassword: "",
               }}
-              
               validationSchema={passwordValidationSchema}
               onSubmit={async (values, { setSubmitting, resetForm }) => {
                 try {
@@ -227,7 +209,6 @@ const Profile = () => {
                     values.newPassword,
                     values.confirmPassword
                   );
-
                   if (result.success) {
                     toast.success(result.message);
                     resetForm();

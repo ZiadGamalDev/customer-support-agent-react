@@ -235,7 +235,6 @@ export const authService = {
 
   updateProfile: async (userData: {
     name?: string;
-    email?: string;
     avatar?: string;
     phone?: string;
   }): Promise<AuthResult> => {
@@ -434,7 +433,7 @@ export const authService = {
   verifyEmail: async (email: string) => {
     try {
       const token = authService.getToken();
-      
+
       const response = await fetch(`${API_URL}/email/send`, {
         method: "POST",
         headers: {
@@ -443,7 +442,7 @@ export const authService = {
         },
         body: JSON.stringify({ email }),
       });
-  
+
       const data = await response.json();
       return data;
     } catch (error) {
