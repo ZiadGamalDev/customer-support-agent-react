@@ -33,7 +33,7 @@ const App = () => (
           <Routes>
             {/* Auth Routes */}
             <Route element={<AuthLayout />}>
-              <Route path="/" element={<Login />} />
+              <Route path="" element={<Login />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
