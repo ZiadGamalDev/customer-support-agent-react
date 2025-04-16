@@ -38,6 +38,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [emailNotVerified, setEmailNotVerified] = useState(false);
 
   const initialValues: LoginFormValues = {
     email: "",
@@ -52,6 +53,12 @@ const Login = () => {
       const result = await authService.login(values.email, values.password);
 
       if (result.error) {
+        if (
+          result.error ===
+          "Email not verified. Please verify your email before logging in."
+        ) {
+          setEmailNotVerified(true);
+        }
         toast.error(result.error);
         return;
       }
@@ -114,6 +121,17 @@ const Login = () => {
                     Forgot password?
                   </Link>
                 </div>
+                {emailNotVerified && (
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Email</Label>
+                    <Link
+                      to="/verify-email"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Resend Email Verification!
+                    </Link>
+                  </div>
+                )}
                 <div className="relative">
                   <Field
                     as={Input}

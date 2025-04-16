@@ -182,6 +182,7 @@ const TicketsPage = () => {
 
   // Handler for click on a ticket
   const handleTicketClick = (ticketId: string) => {
+    localStorage.setItem("ticketId", ticketId.toString());
     navigate(`/chat?ticket=${ticketId}`);
   };
 
@@ -334,6 +335,7 @@ const TicketsPage = () => {
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
+                                localStorage.setItem("ticketId", ticket.id.toString());
                                 navigate(`/chat?ticket=${ticket.id}`);
                               }}
                             >

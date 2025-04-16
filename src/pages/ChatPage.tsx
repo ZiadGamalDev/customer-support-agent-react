@@ -134,7 +134,7 @@ const ChatPage = () => {
       try {
         const mongoTicket = await apiService.tickets.getById(selectedTicketId);
 
-        console.log(mongoTicket)
+        console.log(mongoTicket);
         if (!mongoTicket) {
           toast.error("Ticket not found");
           return;
@@ -142,7 +142,7 @@ const ChatPage = () => {
 
         const ticket = convertMongoTicketToTicket(mongoTicket);
         setSelectedTicket(ticket);
- console.log(ticket)
+        console.log(ticket);
         // Get customer details using the ID
 
         const customer = await apiService.customer.getCustomerById(
