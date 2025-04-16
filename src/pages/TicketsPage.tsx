@@ -182,6 +182,7 @@ const TicketsPage = () => {
 
   // Handler for click on a ticket
   const handleTicketClick = (ticketId: string) => {
+    localStorage.setItem("ticketId", ticketId.toString());
     navigate(`/chat?ticket=${ticketId}`);
   };
 
@@ -189,7 +190,6 @@ const TicketsPage = () => {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight">Tickets</h1>
-     
       </div>
 
       <Card>
@@ -334,6 +334,7 @@ const TicketsPage = () => {
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
+                                localStorage.setItem("ticketId", ticket.id);
                                 navigate(`/chat?ticket=${ticket.id}`);
                               }}
                             >
