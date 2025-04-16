@@ -23,7 +23,6 @@ const profileValidationSchema = Yup.object().shape({
     .required("Name is required")
     .min(3, "Name must be at least 3 characters")
     .matches(/^[a-zA-Z\s]*$/, "Name can only contain letters and spaces"),
-  phone: Yup.string()
     .nullable()
     .matches(
       /^(01)[0-2|5]{1}[0-9]{8}$/,
@@ -150,16 +149,6 @@ const Profile = () => {
                         name="name"
                         component="div"
                         className="text-sm text-red-500"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        value={user?.email || ""}
-                        readOnly
-                        className="bg-gray-100 cursor-not-allowed"
                       />
                     </div>
 
