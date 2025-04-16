@@ -36,6 +36,8 @@ const ChatPage = () => {
   const [searchParams] = useSearchParams();
   const initialTicketId = searchParams.get("ticket");
 
+  localStorage.setItem("ticketId", initialTicketId);
+
   const [loading, setLoading] = useState(true);
   const [tickets, setTickets] = useState<MongoChat[]>([]);
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(
@@ -167,18 +169,37 @@ const ChatPage = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+  const ticketId = localStorage.getItem("ticketId");
+
+  // Modify the useEffect in ChatPage that handles socket room joining
 
   useEffect(() => {
-    if (selectedTicketId) {
-      // Join the chat room when a ticket is selected
-      socketService.joinChatRoom(selectedTicketId, "agent");
+    // Get ticketId from either URL params or localStorage as fallback
+    const activeTicketId = selectedTicketId || localStorage.getItem("ticketId");
 
-      // Cleanup when component unmounts or ticket changes
-      return () => {
-        socketService.leaveTicketRoom(selectedTicketId);
-      };
+    if (activeTicketId) {
+      console.log("Joining chat room for ticket:", activeTicketId);
+
+      // Make sure socket is connected before attempting to join
+      if (socketService.isConnected()) {
+        socketService.joinChatRoom(activeTicketId, "agent");
+      } else {
+        // If not connected, reconnect first then join
+        socketService.connect();
+        // Give it a moment to connect before joining
+        setTimeout(() => {
+          socketService.joinChatRoom(activeTicketId, "agent");
+        }, 500);
+      }
     }
-  }, [selectedTicketId]);
+
+    // Clean up function
+    return () => {
+      if (activeTicketId) {
+        socketService.leaveTicketRoom(activeTicketId);
+      }
+    };
+  }, [selectedTicketId]); // Depend on selectedTicketId instead of ticketId from localStorage
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -545,10 +545,55 @@ class SocketService {
     this.connected = false;
   }
 
+  // sendMessage(chatId: string, content: string) {
+  //   if (!this.socket || !this.connected) {
+  //     console.error("Socket not connected");
+  //     return false;
+  //   }
+
+  //   const user = authService.getCurrentUser();
+  //   if (!user) {
+  //     console.error("No authenticated user");
+  //     return false;
+  //   }
+
+  //   console.log("Sending message with payload:", {
+  //     chatId,
+  //     content,
+  //   });
+
+  //   // Add event listener for any errors
+  //   this.socket.once("sendMessageError", (error) => {
+  //     console.error("Error sending message:", error);
+  //   });
+
+  //   this.socket.emit("sendMessage", {
+  //     chatId,
+  //     message: content,
+  //   });
+
+  //   return true;
+  // }
+
+  // Modify the sendMessage method in socketService
+
   sendMessage(chatId: string, content: string) {
     if (!this.socket || !this.connected) {
-      console.error("Socket not connected");
-      return false;
+      console.error("Socket not connected, attempting to reconnect");
+
+      // Try to reconnect
+      this.connect();
+
+      // If still not connected, return false
+      if (!this.connected) {
+        toast.error(
+          "Unable to connect to chat server. Please refresh the page."
+        );
+        return false;
+      }
+
+      // Ensure we're in the right room
+      this.joinChatRoom(chatId, "agent");
     }
 
     const user = authService.getCurrentUser();
@@ -562,11 +607,6 @@ class SocketService {
       content,
     });
 
-    // Add event listener for any errors
-    this.socket.once("sendMessageError", (error) => {
-      console.error("Error sending message:", error);
-    });
-
     this.socket.emit("sendMessage", {
       chatId,
       message: content,
@@ -574,7 +614,6 @@ class SocketService {
 
     return true;
   }
-
   onMessage(handler: MessageHandler) {
     this.messageHandlers.push(handler);
     return () => {
