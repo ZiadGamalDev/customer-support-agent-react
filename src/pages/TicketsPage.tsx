@@ -276,9 +276,6 @@ const TicketsPage = () => {
                       <TableHead className="hidden sm:table-cell">
                         Created
                       </TableHead>
-                      <TableHead className="hidden lg:table-cell">
-                        Updated
-                      </TableHead>
                       <TableHead className="hidden md:table-cell">
                         Priority
                       </TableHead>
