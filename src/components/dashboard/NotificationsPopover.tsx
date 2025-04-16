@@ -152,18 +152,16 @@ export function NotificationsPopover() {
 
     // Navigate based on notification type
     if (
-      notification.type === "ticket_assigned" ||
-      notification.type === "customer_reply" ||
-      notification.type === "ticket_updated"
+      notification.type === "chat_assignment" ||
+      notification.type === "message" 
+  
     ) {
       if (notification.ticketId) {
         navigate(`/chat?ticket=${notification.ticketId}`);
         setOpen(false);
       }
-    } else if (
-      notification.type === "status_changed" &&
-      notification.ticketId
-    ) {
+    } 
+    else if(notification.type==='status_change'&&notification.ticketId){
       navigate(`/tickets?highlight=${notification.ticketId}`);
       setOpen(false);
     }

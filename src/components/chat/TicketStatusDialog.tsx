@@ -33,12 +33,7 @@ export const TicketStatusDialog = ({
   const [isUpdating, setIsUpdating] = useState(false);
 
   const statusOptions: StatusOption[] = [
-    {
-      value: "open",
-      label: "Open",
-      icon: <AlertCircle className="h-5 w-5 text-blue-500" />,
-      description: "Ticket is active and needs attention",
-    },
+   
     {
       value: "pending",
       label: "Pending",
@@ -51,12 +46,7 @@ export const TicketStatusDialog = ({
       icon: <CheckCircle className="h-5 w-5 text-green-500" />,
       description: "Issue has been fixed",
     },
-    {
-      value: "closed",
-      label: "Closed",
-      icon: <XCircle className="h-5 w-5 text-red-500" />,
-      description: "Ticket is no longer active",
-    },
+    
   ];
 
   const getBadgeVariant = (status: Ticket["status"]) => {

@@ -287,12 +287,7 @@ export interface SocketNotification {
   message: string;
   time: string;
   read: boolean;
-  type:
-    | "ticket_assigned"
-    | "customer_reply"
-    | "ticket_updated"
-    | "status_changed"
-    | "system";
+  type: "chat_assignment" | "message" | "status_change" | "system";
   ticketId?: string;
 }
 
@@ -462,7 +457,7 @@ class SocketService {
         message: notification.subject || "A new chat has been assigned to you",
         time: "Just now",
         read: false,
-        type: "ticket_assigned",
+        type: "chat_assignment",
         ticketId: notification.reference.id || notification._id || chat._id,
       };
 
@@ -495,7 +490,7 @@ class SocketService {
         message: chat.subject || "A new chat has been created",
         time: "Just now",
         read: false,
-        type: "ticket_assigned",
+        type: "chat_assignment",
         ticketId: chat._id,
       };
 
