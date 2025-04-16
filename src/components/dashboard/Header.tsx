@@ -96,22 +96,9 @@ export function Header({ sidebarOpen, setSidebarOpen }: HeaderProps) {
             <Menu className="h-5 w-5" />
             <span className="sr-only">Toggle Menu</span>
           </Button>
-
-          <form onSubmit={handleSearch} className="hidden md:flex relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search tickets, customers..."
-              className="w-64 pl-8"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-            />
-          </form>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Messages Popover */}
-          <MessagesPopover />
 
           {/* Notifications Popover */}
           <NotificationsPopover />
