@@ -1,94 +1,151 @@
-
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ticketService } from "@/services/ticketService";
 import type { Ticket } from "@/services/ticketService";
 import { authService } from "@/services/authService";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Users, Ticket as TicketIcon, Inbox, CheckCircle2, Clock, AlertCircle, LoaderCircle } from "lucide-react";
+import {
+  ChevronRight,
+  Users,
+  Ticket as TicketIcon,
+  Inbox,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  LoaderCircle,
+} from "lucide-react";
+
+interface Stats {
+  chat: {
+    total: number;
+    resolved: number;
+    pending: number;
+    open: number;
+    new: number;
+  };
+}
+
+interface RecentChat {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  priority: "low" | "medium" | "high";
+  createdAt: string;
+  agent?: {
+    name: string;
+  };
+}
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const user = authService.getCurrentUser();
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [chats, setChats] = useState<RecentChat[]>([]);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [loadingChats, setLoadingChats] = useState(true);
 
   useEffect(() => {
-    const fetchTickets = async () => {
+    const fetchStats = async () => {
       try {
-        const fetchedTickets = await ticketService.getTickets({ agentId: user?.id });
-        setTickets(fetchedTickets);
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:3000/dashboard/statistics", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        setStats(data.statistics);
       } catch (error) {
-        console.error("Failed to fetch tickets:", error);
+        console.error("Failed to fetch statistics", error);
       } finally {
-        setLoading(false);
+        setLoadingStats(false);
       }
     };
 
-    fetchTickets();
-  }, [user?.id]);
+    const fetchChats = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(
+          "http://localhost:3000/dashboard/recent-chats",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await res.json();
+        setChats(data);
+      } catch (error) {
+        console.error("Failed to fetch recent chats", error);
+      } finally {
+        setLoadingChats(false);
+      }
+    };
 
-  // Calculate counts and group tickets
-  const openTickets = tickets.filter(ticket => ticket.status === "open");
-  const pendingTickets = tickets.filter(ticket => ticket.status === "pending");
-  const resolvedTickets = tickets.filter(ticket => ticket.status === "resolved");
-  
-  const highPriorityTickets = tickets.filter(ticket => ticket.priority === "high" || ticket.priority === "urgent");
-
-  const stats = [
-    {
-      title: "Total Assigned",
-      value: tickets.length,
-      icon: TicketIcon,
-    },
-    {
-      title: "Open",
-      value: openTickets.length,
-      icon: Inbox,
-    },
-    {
-      title: "Pending",
-      value: pendingTickets.length,
-      icon: Clock,
-    },
-    {
-      title: "Resolved",
-      value: resolvedTickets.length,
-      icon: CheckCircle2,
-    },
-  ];
+    fetchStats();
+    fetchChats();
+  }, []);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, {user?.name}! Here's an overview of your support tickets.
+          Welcome back, {user?.name}! Here's an overview of your support
+          tickets.
         </p>
       </div>
 
+      {/* Statistics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardContent className="p-6 flex justify-between items-center">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  {stat.title}
-                </p>
-                <p className="text-3xl font-bold">{stat.value}</p>
-              </div>
-              <stat.icon className="h-8 w-8 text-muted-foreground/50" />
-            </CardContent>
-          </Card>
-        ))}
+        {loadingStats ? (
+          <SkeletonCard count={4} />
+        ) : (
+          <>
+            <StatCard
+              title="Total Chats"
+              value={stats?.chat.total ?? 0}
+              icon={<TicketIcon />}
+            />
+            <StatCard
+              title="Resolved Chats"
+              value={stats?.chat.resolved ?? 0}
+              icon={<CheckCircle2 />}
+            />
+            <StatCard
+              title="Pending Chats"
+              value={stats?.chat.pending ?? 0}
+              icon={<Clock />}
+            />
+            <StatCard
+              title="Open Chats"
+              value={stats?.chat.open ?? 0}
+              icon={<Inbox />}
+            />
+            <StatCard
+              title="New Chats"
+              value={stats?.chat.new ?? 0}
+              icon={<AlertCircle />}
+            />
+          </>
+        )}
       </div>
 
+      {/* Tickets */}
       <Tabs defaultValue="recent">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-6">
           <TabsList>
             <TabsTrigger value="recent">Recent Tickets</TabsTrigger>
-            <TabsTrigger value="priority">High Priority</TabsTrigger>
           </TabsList>
           <button
             onClick={() => navigate("/tickets")}
@@ -100,109 +157,43 @@ const Dashboard = () => {
         </div>
 
         <TabsContent value="recent" className="space-y-4 mt-4">
-          {loading ? (
-            <div className="flex justify-center p-6">
-              <LoaderCircle className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : tickets.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2">
-              {tickets.slice(0, 4).map((ticket) => (
-                <Card key={ticket.id} className="overflow-hidden">
-                  <CardHeader className="p-4 pb-0">
-                    <CardTitle className="text-lg font-medium">
-                      {ticket.subject}
-                    </CardTitle>
-                    <CardDescription className="flex items-center mt-1">
-                      <span className="text-xs">
-                        {new Date(ticket.createdAt).toLocaleDateString()}
-                      </span>
-                      <span className={`ml-2 inline-flex items-center rounded-full px-2 py-1 text-xs ${
-                        ticket.priority === "urgent" ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" : 
-                        ticket.priority === "high" ? "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300" : 
-                        ticket.priority === "medium" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300" : 
-                        "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                      }`}>
-                        {ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}
-                      </span>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-4">
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {ticket.description}
-                    </p>
-                    <div className="mt-4">
-                      <button
-                        onClick={() => navigate(`/chat?ticket=${ticket.id}`)}
-                        className="text-sm text-primary"
-                      >
-                        View details
-                      </button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+          {loadingChats ? (
+            <SkeletonCard count={2} />
           ) : (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <p className="text-muted-foreground">No tickets assigned to you</p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="priority" className="space-y-4 mt-4">
-          {loading ? (
-            <div className="flex justify-center p-6">
-              <LoaderCircle className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : highPriorityTickets.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2">
-              {highPriorityTickets.slice(0, 4).map((ticket) => (
-                <Card key={ticket.id} className="overflow-hidden">
-                  <CardHeader className="p-4 pb-0">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg font-medium">
-                        {ticket.subject}
-                      </CardTitle>
-                      {ticket.priority === "urgent" && (
-                        <AlertCircle className="h-5 w-5 text-red-500" />
-                      )}
-                    </div>
-                    <CardDescription className="flex items-center mt-1">
-                      <span className="text-xs">
-                        {new Date(ticket.createdAt).toLocaleDateString()}
-                      </span>
-                      <span className={`ml-2 inline-flex items-center rounded-full px-2 py-1 text-xs ${
-                        ticket.priority === "urgent" ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" : 
-                        "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300"
-                      }`}>
-                        {ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}
-                      </span>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-4">
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {ticket.description}
-                    </p>
-                    <div className="mt-4">
-                      <button
-                        onClick={() => navigate(`/chat?ticket=${ticket.id}`)}
-                        className="text-sm text-primary"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Array.isArray(chats) &&
+                chats.map((chat) => (
+                  <Card key={chat.id}>
+                    <CardHeader>
+                      <CardTitle className="capitalize">{chat.title}</CardTitle>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(chat.createdAt).toLocaleString()}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <span
+                        className={`text-xs font-medium px-2 py-1 rounded ${
+                          chat.priority === "high"
+                            ? "bg-red-100 text-red-800"
+                            : chat.priority === "medium"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-green-100 text-green-800"
+                        }`}
                       >
-                        View details
-                      </button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        {chat.priority.charAt(0).toUpperCase() +
+                          chat.priority.slice(1)}
+                      </span>
+                      <p className="text-sm text-muted-foreground">
+                        Assigned to:{" "}
+                        <span className="text-primary">
+                          {chat.agent?.name || "Unassigned"}
+                        </span>
+                      </p>
+                      <p className="text-sm">{chat.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
-          ) : (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <p className="text-muted-foreground">No high priority tickets</p>
-              </CardContent>
-            </Card>
           )}
         </TabsContent>
       </Tabs>
@@ -211,3 +202,36 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+// Stat Card component
+const StatCard = ({
+  title,
+  value,
+  icon,
+}: {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+}) => (
+  <Card className="flex flex-col justify-between">
+    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardTitle className="text-sm font-medium">{title}</CardTitle>
+      <div className="text-muted-foreground">{icon}</div>
+    </CardHeader>
+    <CardContent>
+      <div className="text-2xl font-bold">{value}</div>
+    </CardContent>
+  </Card>
+);
+
+// Skeleton Card component (for loading)
+const SkeletonCard = ({ count }: { count: number }) => (
+  <>
+    {Array.from({ length: count }).map((_, idx) => (
+      <div
+        key={idx}
+        className="animate-pulse rounded-lg border bg-muted p-4 h-24"
+      ></div>
+    ))}
+  </>
+);

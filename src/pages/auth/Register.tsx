@@ -34,8 +34,8 @@ const validationSchema = Yup.object().shape({
     .required("Password is required")
     .min(8, "Password must be at least 8 characters")
     .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-      "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character"
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]/,
+      "Password must contain at least one uppercase letter, one lowercase letter"
     ),
 
   confirmPassword: Yup.string()
@@ -80,7 +80,7 @@ const Register = () => {
       }
 
       toast.success("Registration successful!");
-      navigate("/dashboard");
+      navigate("/login");
     } catch (error) {
       toast.error("An unexpected error occurred");
       console.error(error);
@@ -114,7 +114,7 @@ const Register = () => {
                   as={Input}
                   id="name"
                   name="name"
-                  placeholder="John Doe"
+                  placeholder="Your Name..."
                   className={
                     errors.name && touched.name ? "border-red-500" : ""
                   }

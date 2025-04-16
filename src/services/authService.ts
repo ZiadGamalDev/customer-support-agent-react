@@ -119,7 +119,6 @@ export const authService = {
         ...user,
         token,
       };
-      localStorage.setItem(USER_KEY, JSON.stringify(userToStore));
 
       return {
         success: true,
@@ -429,6 +428,27 @@ export const authService = {
         message: "An unexpected error occurred",
         error: "An unexpected error occurred",
       };
+    }
+  },
+
+  verifyEmail: async (email: string) => {
+    try {
+      const token = authService.getToken();
+      
+      const response = await fetch(`${API_URL}/email/send`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+  
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Verify Email Error:", error);
+      return { success: false, message: "Something went wrong" };
     }
   },
 };
