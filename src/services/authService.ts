@@ -73,6 +73,7 @@ export const authService = {
         token,
       };
       localStorage.setItem(USER_KEY, JSON.stringify(userToStore));
+      localStorage.setItem("token", token);
 
       return {
         success: true,

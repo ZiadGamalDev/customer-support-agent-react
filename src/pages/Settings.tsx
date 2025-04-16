@@ -24,30 +24,50 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { Mail } from "lucide-react";
 
 const Settings = () => {
-  const [loading, setLoading] = useState(false);
-  const [emailTo, setEmailTo] = useState("");
+  const [emailTo] = useState("ziad.gamal.tech@gmail.com");
   const [emailSubject, setEmailSubject] = useState("");
   const [emailBody, setEmailBody] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [tab, setTab] = useState("admin");
 
   const handleSendEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!emailTo || !emailSubject || !emailBody) {
-      toast.error("Please fill all email fields");
-      return;
-    }
-    
     setLoading(true);
-    
-    // Simulate sending email
-    setTimeout(() => {
-      toast.success("Email sent to admin successfully");
-      setEmailTo("");
+  
+    const token = localStorage.getItem("token");
+  
+    try {
+      const response = await fetch("http://localhost:3000/email/report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: emailTo,
+          subject: emailSubject,
+          message: emailBody,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to send email.");
+      }
+  
+      toast.success("Message sent successfully!");
+      // Clear fields after success
       setEmailSubject("");
       setEmailBody("");
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong!");
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
+  
 
   return (
     <div className="space-y-6">
@@ -56,98 +76,10 @@ const Settings = () => {
         <p className="text-muted-foreground">Manage your application preferences</p>
       </div>
 
-      <Tabs defaultValue="appearance" className="w-full">
+      <Tabs value={tab} onValueChange={setTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="admin">Contact Admin</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="appearance" className="mt-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-              <CardDescription>
-                Customize the appearance of the application
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Theme</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Switch between light and dark mode
-                    </div>
-                  </div>
-                  <ModeToggle />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch id="compact-mode" />
-                  <Label htmlFor="compact-mode">Compact Mode</Label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch id="reduced-motion" />
-                  <Label htmlFor="reduced-motion">Reduced Motion</Label>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="notifications" className="mt-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>
-                Configure how you receive notifications
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>New Ticket Notifications</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Get notified when a new ticket is assigned to you
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Ticket Updates</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Get notified when a ticket is updated
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Customer Messages</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Get notified when a customer sends a new message
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Receive notifications via email
-                    </p>
-                  </div>
-                  <Switch />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
         
         <TabsContent value="admin" className="mt-6 space-y-6">
           <Card>
@@ -164,7 +96,7 @@ const Settings = () => {
                   <Input
                     id="admin-email"
                     value={emailTo}
-                    onChange={(e) => setEmailTo(e.target.value)}
+                    readOnly
                     placeholder="admin@example.com"
                   />
                 </div>
