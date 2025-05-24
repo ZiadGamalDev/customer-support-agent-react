@@ -56,12 +56,15 @@ const Dashboard = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:3000/dashboard/statistics", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPPORT_API_URL}/dashboard/statistics`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         const data = await res.json();
         setStats(data.statistics);
       } catch (error) {
@@ -75,7 +78,7 @@ const Dashboard = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          "http://localhost:3000/dashboard/recent-chats",
+          `${import.meta.env.VITE_SUPPORT_API_URL}/dashboard/recent-chats`,
           {
             method: "GET",
             headers: {

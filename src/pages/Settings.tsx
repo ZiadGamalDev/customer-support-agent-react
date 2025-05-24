@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -38,7 +37,7 @@ const Settings = () => {
     const token = localStorage.getItem("token");
   
     try {
-      const response = await fetch("http://localhost:3000/email/report", {
+      const response = await fetch(`${import.meta.env.VITE_SUPPORT_API_URL}/email/report`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
