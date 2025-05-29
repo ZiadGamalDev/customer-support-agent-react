@@ -107,7 +107,9 @@ class SocketService {
 
     this.socket.on("error", (error) => {
       console.error("Socket error:", error);
-      toast.error(`Socket error: ${error.message || "Unknown error"}`);
+      if (error.message !== "Failed to join chat") {
+        toast.error(`Socket error: ${error.message || "Unknown error"}`);
+      }
     });
 
     this.socket.on("messageReceived", ({ message }) => {
