@@ -77,9 +77,16 @@ class SocketService {
 
     this.socket = io(SOCKET_URL, {
       auth: {
-        token: user.id,
+        token: user.token, // Pass the JWT token instead of user ID
       },
-      transports: ["websocket"],
+      transports: ["websocket", "polling"],
+      forceNew: true,
+      timeout: 20000,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      upgrade: true,
+      secure: SOCKET_URL.startsWith('https'),
     });
 
     this.socket.off("connect");
