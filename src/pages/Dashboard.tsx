@@ -57,7 +57,7 @@ const Dashboard = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          `${import.meta.env.VITE_SUPPORT_API_URL}/dashboard/statistics`,
+          `${import.meta.env.VITE_SUPPORT_API_URL?.replace(/\/+$/, '')}/dashboard/statistics`,
           {
             method: "GET",
             headers: {
@@ -78,7 +78,7 @@ const Dashboard = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          `${import.meta.env.VITE_SUPPORT_API_URL}/dashboard/recent-chats`,
+          `${import.meta.env.VITE_SUPPORT_API_URL?.replace(/\/+$/, '')}/dashboard/recent-chats`,
           {
             method: "GET",
             headers: {

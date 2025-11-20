@@ -5,8 +5,10 @@ import { authService } from "./authService";
 import { OrdersResponse } from './../types/mongoTypes';
 import { Order } from "./../types/mongoTypes";
 
+import { SUPPORT_API_URL, ECOMMERCE_API_URL } from '@/utils/apiUrl';
+
 // Base API URL - this should be configured from environment variables in a real app
-const API_URL = import.meta.env.VITE_SUPPORT_API_URL;
+const API_URL = SUPPORT_API_URL;
 
 // Create an axios instance with authentication headers
 const api = axios.create({
@@ -126,7 +128,7 @@ export const apiService = {
     getCustomerById: async (customerId: string): Promise<Customer | any> => {
       try {
         const response = await axios.get<CustomerResponse>(
-          `${import.meta.env.VITE_ECOMMERCE_API_URL}/profile/${customerId}`
+          `${ECOMMERCE_API_URL}/profile/${customerId}`
         );
 
         console.log('Customer data:', response.data);
@@ -152,7 +154,7 @@ export const apiService = {
     getCustomerOrders: async (customerId: string): Promise<Order[]> => {
       try {
         const response = await axios.get<OrdersResponse>(
-          `${import.meta.env.VITE_ECOMMERCE_API_URL}/order/my-orders/${customerId}`
+          `${ECOMMERCE_API_URL}/order/my-orders/${customerId}`
         );
 
         console.log('Orders data:', response.data);

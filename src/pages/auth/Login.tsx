@@ -63,13 +63,8 @@ const Login = () => {
         return;
       }
 
-      if (result.success) {
-        toast.success("Login successful!");
-        // Navigate immediately - token is already saved
-        navigate("/dashboard", { replace: true });
-      } else {
-        toast.error(result.message || "Login failed");
-      }
+      toast.success("Login successful!");
+      navigate("/dashboard");
     } catch (error) {
       toast.error("An unexpected error occurred");
       console.error(error);

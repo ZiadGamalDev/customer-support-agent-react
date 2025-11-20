@@ -53,7 +53,9 @@ export interface PasswordConfirmResponse {
 }
 
 const USER_KEY = "user";
-const API_URL = import.meta.env.VITE_SUPPORT_API_URL;
+import { SUPPORT_API_URL } from '@/utils/apiUrl';
+
+const API_URL = SUPPORT_API_URL;
 
 export const authService = {
   login: async (email: string, password: string): Promise<AuthResult> => {
