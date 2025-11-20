@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import {
   LayoutDashboard,
   MessageSquare,
@@ -65,6 +65,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const SidebarMobile = (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetContent side="left" className="w-[240px] p-0 bg-background border-r">
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4">
             <Link to="/dashboard" className="flex items-center gap-2">

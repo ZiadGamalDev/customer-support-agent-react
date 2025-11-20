@@ -3,6 +3,7 @@ import { CheckCircle, Clock, AlertCircle, XCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -96,6 +97,9 @@ export const TicketStatusDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Update Ticket Status</DialogTitle>
+          <DialogDescription>
+            Select a new status for this ticket. The customer will be notified of the change.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-4 py-4">
           {statusOptions.map((option) => (

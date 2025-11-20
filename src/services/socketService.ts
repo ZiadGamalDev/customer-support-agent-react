@@ -109,6 +109,7 @@ class SocketService {
 
     this.socket.on("disconnect", () => {
       this.connected = false;
+      this.notificationRoomJoined = false; // Reset on disconnect
       console.log("Socket disconnected");
     });
 
@@ -260,8 +261,15 @@ class SocketService {
     });
   }
 
+  private notificationRoomJoined: boolean = false;
+
   joinNotificationRoom(agentId: string) {
     if (!this.socket || !this.connected) return;
+    
+    // Prevent duplicate joins
+    if (this.notificationRoomJoined) {
+      return;
+    }
 
     console.log("Joining notification room for agent:", agentId);
     this.socket.emit("joinNotification", agentId);
@@ -269,6 +277,8 @@ class SocketService {
     // Important: Also join the room with agentId directly
     // This is needed because backend sends to agentId room
     this.socket.emit("joinRoom", agentId);
+    
+    this.notificationRoomJoined = true;
   }
 
   joinChatRoom(chatId: string, userType: "agent") {

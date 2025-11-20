@@ -14,10 +14,20 @@ export function useSocket() {
       socketService.connect();
     }
 
-    // Set up connection status listener
+    // Update connection status immediately
+    setIsConnected(socketService.isConnected());
+
+    // Set up connection status listener with longer interval to reduce re-renders
     const checkConnectionInterval = setInterval(() => {
-      setIsConnected(socketService.isConnected());
-    }, 2000);
+      const connected = socketService.isConnected();
+      setIsConnected((prev) => {
+        // Only update state if connection status actually changed
+        if (prev !== connected) {
+          return connected;
+        }
+        return prev;
+      });
+    }, 5000); // Increased from 2s to 5s to reduce unnecessary checks
 
     // Clean up on unmount
     return () => {
