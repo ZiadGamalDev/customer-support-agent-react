@@ -1,18 +1,31 @@
 import { Outlet } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { authService } from "@/services/authService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const AuthLayout = () => {
   const navigate = useNavigate();
-  const user = authService.getCurrentUser();
+  const location = useLocation();
+  const [user, setUser] = useState(authService.getCurrentUser());
 
   useEffect(() => {
-    // If user is already logged in, redirect to dashboard
-    if (user) {
-      navigate("/dashboard");
-    }
-  }, [user, navigate]);
+    // Check for user changes (e.g., after login)
+    const checkUser = () => {
+      const currentUser = authService.getCurrentUser();
+      setUser(currentUser);
+      if (currentUser && (location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/")) {
+        navigate("/dashboard", { replace: true });
+      }
+    };
+
+    // Check immediately
+    checkUser();
+
+    // Also check periodically in case user logs in from another tab/window
+    const interval = setInterval(checkUser, 500);
+
+    return () => clearInterval(interval);
+  }, [navigate, location.pathname]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background">
