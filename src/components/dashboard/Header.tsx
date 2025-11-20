@@ -37,13 +37,11 @@ export function Header({ sidebarOpen, setSidebarOpen }: HeaderProps) {
           setStatus(profile.user.status || "available");
         } else {
           console.error("Failed to load user profile:", profile.message);
-          // If profile fails, clear invalid token and let RequireAuth handle redirect
-          authService.logout();
+          navigate("/login");
         }
       } catch (error) {
         console.error("Failed to load user profile:", error);
-        // If profile fails, clear invalid token and let RequireAuth handle redirect
-        authService.logout();
+        navigate("/login");
       }
     };
 
