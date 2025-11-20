@@ -64,7 +64,11 @@ const Login = () => {
       }
 
       toast.success("Login successful!");
-      navigate("/dashboard");
+      // Use replace to prevent going back to login page
+      // Add small delay to ensure token is saved
+      setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 100);
     } catch (error) {
       toast.error("An unexpected error occurred");
       console.error(error);

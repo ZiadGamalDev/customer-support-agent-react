@@ -21,7 +21,7 @@ const AuthLayout = () => {
         const profile = await authService.getProfile();
         if (profile.success && profile.user) {
           // Valid token, redirect to dashboard
-          navigate("/dashboard");
+          navigate("/dashboard", { replace: true });
         } else {
           // Invalid token, clear it
           authService.logout();
@@ -34,7 +34,12 @@ const AuthLayout = () => {
       }
     };
 
-    validateAndRedirect();
+    // Add a small delay to prevent race conditions with login
+    const timer = setTimeout(() => {
+      validateAndRedirect();
+    }, 50);
+
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   if (isValidating) {
