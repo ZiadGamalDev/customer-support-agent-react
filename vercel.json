@@ -1,4 +1,11 @@
 {
   "buildCommand": "npm install --legacy-peer-deps && npm run build",
-  "installCommand": "npm install --legacy-peer-deps"
+  "installCommand": "npm install --legacy-peer-deps",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://customer-support-agent.ziadgamal.com/$1",
+      "permanent": true
+    }
+  ]
 }
