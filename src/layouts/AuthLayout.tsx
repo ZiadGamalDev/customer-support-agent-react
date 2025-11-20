@@ -1,11 +1,12 @@
 
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { authService } from "@/services/authService";
 import { useNavigate } from "react-router-dom";
 
 const AuthLayout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isValidating, setIsValidating] = useState(true);
 
   useEffect(() => {
@@ -20,8 +21,10 @@ const AuthLayout = () => {
       try {
         const profile = await authService.getProfile();
         if (profile.success && profile.user) {
-          // Valid token, redirect to dashboard
-          navigate("/dashboard", { replace: true });
+          // Valid token, redirect to dashboard only if we're on auth pages
+          if (location.pathname === "/login" || location.pathname === "/register" || location.pathname === "") {
+            navigate("/dashboard", { replace: true });
+          }
         } else {
           // Invalid token, clear it
           authService.logout();
@@ -37,10 +40,10 @@ const AuthLayout = () => {
     // Add a small delay to prevent race conditions with login
     const timer = setTimeout(() => {
       validateAndRedirect();
-    }, 50);
+    }, 100);
 
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   if (isValidating) {
     return (

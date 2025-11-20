@@ -63,12 +63,13 @@ const Login = () => {
         return;
       }
 
-      toast.success("Login successful!");
-      // Use replace to prevent going back to login page
-      // Add small delay to ensure token is saved
-      setTimeout(() => {
+      if (result.success) {
+        toast.success("Login successful!");
+        // Navigate immediately - token is already saved
         navigate("/dashboard", { replace: true });
-      }, 100);
+      } else {
+        toast.error(result.message || "Login failed");
+      }
     } catch (error) {
       toast.error("An unexpected error occurred");
       console.error(error);
