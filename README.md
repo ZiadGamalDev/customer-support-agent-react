@@ -54,6 +54,14 @@ Each agent can:
 
 ---
 
+## 🌐 Live Demo
+
+- **Production App:** https://customer-support-agent.ziadgamal.com
+- **Backend API:** https://customer-support-api.ziadgamal.com
+- **Legacy Vercel:** https://customer-support-agent-react.vercel.app (redirects to new domain)
+
+---
+
 ## 🌍 Live Use Case
 
 This is one part of a full-blown customer support system.
