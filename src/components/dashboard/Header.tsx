@@ -32,8 +32,13 @@ export function Header({ sidebarOpen, setSidebarOpen }: HeaderProps) {
     const loadUserProfile = async () => {
       try {
         const profile = await authService.getProfile();
-        setUser(profile.user);
-        setStatus(profile.user.status);
+        if (profile.success && profile.user) {
+          setUser(profile.user);
+          setStatus(profile.user.status || "available");
+        } else {
+          console.error("Failed to load user profile:", profile.message);
+          navigate("/login");
+        }
       } catch (error) {
         console.error("Failed to load user profile:", error);
         navigate("/login");
